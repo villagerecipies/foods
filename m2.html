@@ -1,0 +1,750 @@
+knockout JS
+----------------------
+Q)What common ko bindings are used?
+
+<div data-bind="visible: Observer()"> is responsible for the visibility of the element and takes the value boolean.
+
+<div data-bind="text: ObserverText()"> is used to display text
+
+<p data-bind="html: ObserverElements()"> is used to output html.
+
+<form data-bind="attr: {'data-hasrequired': $t('* Required Fields')}"> — attr is user to output attributes
+
+<button data-bind="click: function"> is used to bind a function to an event when it clicks on an element, the function is callback, then we indicate only the name without calling.
+
+
+Q)Demonstrate an understanding of ko virtual elements.
+We will also analyze the main virtual elements that are used in Magento 2:
+<!-- ko foreach: $data --><!-- /ko --> is used to sort arrays to display date from the array.
+
+<!-- ko template: getTemplate() --><!-- /ko --> as it was mentioned before is used to output data from the array according to the pattern that we set in template.
+
+<!-- ko if: function()--><!-- /ko --> is used to check the conditions for displaying data from the condition.There is also <!-- ko ifnot: conditionFunc() --><!-- /ko --> for the opposite conditions.
+
+<!-- ko i18n: 'of' --><!-- /ko --> is used for translations in Magento 2, what was written in the first section.
+
+<!-- ko text: getText() --><!-- /ko --> is used to display text from functions, observable objects, etc.
+
+<span translate="international text" />
+
+<span data-bind="i18n: 'international text'"></span>
+
+
+knockout js translations in html file
+
+
+
+js: Questions
+_______________________
+
+
+<script type = “text / javascript”> script content </script> inline in phtml.
+
+deferred = “true” or at least async = “true” in all cases when it is possible (for scripts by links, it doesn’t work with inline scripts).
+
+Instead of <script src = “js / script.js” /> you can use <link src = “js / script.js” />
+
+<script src = ”absolute or relative path to the script” (also use src_type = “url” if the path is absolute)> </script> in your xml
+
+ 
+
+magento frame work:
+
+data-mage-init  = ‘{“VendorName_Module / js / script”: {“configuration-value”: true}}’
+
+ 
+
+The final script:
+
+ 
+
+app/code/VendorName/Module/view/frontend/web/js/script.js
+
+ 
+
+define([], function() {
+
+      return function(element, config) {
+
+         /* config: {
+
+            configuration-value: true
+
+            } */
+
+      };
+
+});
+
+ 
+
+Or using script tag
+
+ 
+
+<script type="script/x-magento-init">
+
+    {".element-selector": 
+
+          {"VendorName_Module/js/script": 
+
+               {"configuration-value": true}
+
+          }
+
+    }
+
+</script>
+
+ 
+
+or using Thiry party module instead of "element-selector"
+
+ 
+
+<script type="text/javascript">
+
+      require([
+
+          "VendorName_Module/js/script" //indicate dependence from the library 
+
+             ], function(loader) {
+
+                  /* your script */
+
+             });
+
+</script>
+
+ 
+
+
+
+Through RequireJS:
+
+ 
+
+This option allows connecting the script at any page, it works faster than the first two, because it requires less code to initialize.
+
+var config = {
+
+deps: ['VendorName_Module/js/script']
+
+};
+
+ 
+
+.phtml:
+
+ 
+
+require([
+
+    'VendorName_Module/js/script'
+
+        ], function(FuntionName) {
+
+          /* … */
+
+       });
+
+
+In frontend <?= $block->getJsLayout();?> it returns a  json format string, built from jsLayout.       
+
+
+So, using <arguments/>, you can create your json object:
+
+
+<referenceBlock name="BlockName">
+
+<arguments>
+
+<argument name="jsLayout" xsi:type="array">
+
+<item name="components" xsi:type="array">
+
+<item name="script" xsi:type="array">
+
+<item name="component" xsi:type="string">VendorName_Module/js/script</item>
+
+</item></item>
+
+</argument>
+
+</arguments>
+
+</referenceBlock>       
+
+ 
+
+ 
+
+
+
+Jquery:
+------------------------------
+ 
+
+How can jQuery UI Widget methods be instantiated?
+
+ 
+
+<script>
+
+    require([
+
+        'jquery',
+
+        'accordion'], function ($) {
+
+        $("#element").accordion();
+
+    });
+
+</script>
+
+ 
+
+
+
+In template using data-mage-init
+
+ 
+
+ 
+
+<div id="element" data-mage-init='{"collapsible":{"openedState": "active", "collapsible": true, "active": true, "collateral": { "openedState": "filter-active", "element": "body" } }}'>
+
+    <div data-role="collapsible">
+
+        <div data-role="trigger">
+
+            <span>Title 1</span>
+
+        </div>
+
+    </div>
+
+    <div data-role="content">Content 1</div>
+
+ 
+
+
+
+In the script file using selector or requiring a function
+
+ 
+
+
+
+require([
+
+        'jquery',
+
+        'accordion'], function ($) {
+
+        $("#element").accordion();
+
+    });
+
+ 
+
+Using <script type=”text/x-magento-init” />
+
+ 
+
+<script type="text/x-magento-init">
+
+{
+
+"#element": { // your selector that uses widget
+
+"accordion": // parameters are displayed here, for example <?php echo $block->getNavigationAccordionConfig(); ?>
+
+
+}
+
+}
+
+<script>
+
+ 
+
+ 
+
+How can you add new methods to a jQuery UI Widget?
+
+ 
+
+app/code/Vendor/Module/view/frontend/requirejs-config.js
+
+ 
+
+var config = {
+
+      "config": {
+
+            "mixins": {
+
+                 "mage/tabs": {
+
+                     'Vendor_Module/js/accordion-mixin': true
+
+                  }
+
+             }
+
+       }
+
+};
+
+ 
+
+app/code/Vendor/Module/view/frontend/web/js/accordion-mixin.js
+
+ 
+
+define([
+
+      'jquery'
+
+], function($) {
+
+       return function (original) {
+
+           $.widget('mage.accordion', original, {
+
+                activate: function() {
+
+                     // you code is here
+
+                return this._super();
+
+                }
+
+           }
+
+       );
+
+       return $['mage']['accordion'];
+
+       }
+
+});
+
+ 
+
+
+
+How can a jQuery UI Widget method be wrapped with custom logic?
+
+ 
+
+
+
+app/code/Vendor/Module/view/frontend/web/js/custom-accordion.js
+
+ 
+
+
+
+define([
+
+'jquery',
+
+'jquery/ui',
+
+'mage/accordion'
+
+], function($) {
+
+         $.widget('vendor.customAccordion', $.mage.accordion, {
+
+              someAction: function(element) {
+
+                // your code
+
+              }
+
+         });
+
+});
+
+ 
+
+
+
+And add to the template:
+
+ 
+
+app/code/Vendor/Module/view/frontend/templates/test.phtml
+
+ 
+
+ 
+
+<div id="element"></div>
+
+<script>
+
+   require([
+
+       'jquery',
+
+       'Vendor_Module/js/custom-accordion'], function ($) {
+
+      $("#element").customAccordion();
+
+      $("#element").customAccordion("someAction");
+
+        // Require a widget function as described above
+
+   });
+
+</script>
+
+ 
+
+ 
+
+6.3. Demonstrate understanding of requireJS
+
+ 
+
+How do you load a file with require.js?
+
+ 
+
+app/code/<Company>/<modulename>/view/frontend
+
+ 
+
+var config = {
+
+    map: {
+
+        '*': {
+
+            belvgmodule: 'Company_modulename/js/belvgrequirejs',
+
+        }
+
+    }
+
+};
+
+The config variable contains properties with the map and deps keys
+
+ 
+
+
+
+requirejs(['helper/belvg'], function(helper_belvg) {
+
+    var message = helper_belvg.getMessage();
+
+    alert(message);
+
+});
+
+ 
+
+
+
+To build dependency on a third-party plugin, specify [shim] in the following configuration files:
+
+ 
+
+var config = {
+
+     "shim": {
+
+     "3-rd-party-plugin": ["jquery"]
+
+     }
+
+};
+
+
+
+How are module aliases configured in requirejs-config.js?
+
+
+require.config({   
+
+    paths: {        
+
+        "hello": "helper/belvg"
+
+    },
+
+});
+
+ 
+
+requirejs(['hello'], function(hello) {
+
+    alert("Some message");
+
+});
+
+ 
+
+How do you regenerate the compiled requirejs-config.js file after changes?
+
+Delete static content and make:
+
+ 
+
+php bin/magento cache:clean
+
+ 
+
+To be totally sure.
+
+ 
+
+Demonstrate that you understand how to create and configure Magento JavaScript mixins.
+
+ 
+
+
+
+Mixins are JavaScript files located in the web/js directory. A mixin file can be in several directories if these directories are in web/js.
+
+ 
+
+Step 1: Create app/code/VendorName/ModuleName/view/frontend/requirejs-config.js
+
+ 
+
+var config = {
+
+    config: {
+
+        mixins: {
+
+            'Magento_Swatches/js/swatch-renderer': {
+
+                'VendorName_ModuleName/js/swatch-renderer-mixin': true
+
+            }
+
+        }
+
+    }
+
+};
+
+ 
+
+Step 2: Create app/code/VendorName/ModuleName/view/frontend/web/js/swatch-renderer-mixin.js
+
+ 
+
+define(['jquery'], function ($) {
+
+    'use strict';
+
+ 
+
+    return function (SwatchRenderer) {
+
+        $.widget('VendorName.SwatchRenderer', $['mage']['SwatchRenderer'], {
+
+            _init: function () {
+
+                console.log('getProductSwatchRenderer');
+
+                this._super();
+
+            }
+
+        });
+
+        return $['mage']['SwatchRenderer'];
+
+    };
+
+});
+
+ 
+
+Configure JavaScript merging and minify in the Admin UI
+
+ 
+
+Admin UI > Stores > Configuration > Advanced tab > Developer > JavaScript Settings
+
+ 
+
+The “Developer” tab is displayed if the site is in Developer’s mode. To switch the site to this mode, you must enter the magento server in console:
+
+ 
+
+bin/magento deploy:mode:set developer
+
+ 
+
+How does Magento minify JavaScript?
+
+The point of js files minification is that everything useless (spaces, lines breaks, etc.) is removed from the file code,  thereby reducing the size (weight), which positively affects the loading of the site as a whole.
+
+ 
+
+What is the purpose of JavaScript bundling and minification?
+
+a lot of server requests when loading a site. JavaScript bundling combines all the files into one, therefore there will be only one request to the server, and with the files minification (their weight reduction) the merged file will be loaded faster.
+
+ 
+
+All this optimizes the site and reduces page loading time.
+
+ 
+
+With Merging, you can only merge Javascript files that are not loaded via RequireJS. If you want to “merge” JS modules, you have to use packaging.
+
+ 
+
+In Vendor/Theme/etc/view.xml you can resize the package and exclude some scripts from the package.
+
+-----------------
+once read and understand? it will be cover 5 to 10 questions 
+
+-----------------------------------------------------------------------------------
+
+1)Which files are required to be present in a theme?
+2)What is the etc/view.xml file used for?
+3)What is the difference between a parent theme and a child theme?
+4)How do the configuration settings affect theme rendering? from admin
+5)Move use in layout file?
+6)How can a custom page layout be created?
+Mixins exmple:
+
+ 
+
+.animation-1 {
+    transition: 300ms ease-in-out;
+    -moz-transition: 300ms ease-in-out;
+    -webkit-transition: 300ms ease-in-out;
+    -o-transition: 300ms ease-in-out;
+}
+.example-1 {
+   .animation-1();
+   width: 100%;
+}
+As a result, after compiling the .less file into a .css file, the .example-1 element will have the following:
+
+ 
+
+.animation-1 {
+   transition: 300ms ease-in-out;
+   -moz-transition: 300ms ease-in-out;
+   -webkit-transition: 300ms ease-in-out;
+   -o-transition: 300ms ease-in-out;
+}
+.example-1 {
+   transition: 300ms ease-in-out;
+   -moz-transition: 300ms ease-in-out;
+   -webkit-transition: 300ms ease-in-out;
+   -o-transition: 300ms ease-in-out;
+   width: 100%;
+}
+7)diffrences
+styles-m.less contains basic website styles and styles for mobile devices. The file contains other files (for example, _styles.less).
+styles-l.less contains styles for desktops. The file contains other files (for example, _styles.less).
+8)difference
+/source/_theme.less is a file in which new values are set for standard variables of the Magento UI library.
+print.less are styles for a printed version of a site’s page.
+/source/_variables.less is a file in which custom variables are placed.
+9)Server-side Less or Client-side Less compilation mode you can choose in the admin following the path “Store > Configuration > Advanced > Developer > Frontend Development Workflow”, where pick a needed mode in “Workflow type” option.
+
+ 
+
+10)we enable or disable CSS merging и CSS minification
+For this, in the admin of the site we go to Store > Configuration > Advanced > Developer > CSS Settings
+11)
+If you don’t know where the necessary template is – enable hints
+
+ 
+
+Stores -> Configuration -> Developer -> Advanced -> Debug -> Enabled Template Path Hints for Storefront (Yes)
+
+ 
+
+12)What commands must be executed to deploy static file types?
+php bin/magento setup:static-content:deploy
+
+ 
+
+13)
+In order to enable the production mode, execute this command:
+bin/magento deploy:mode:set production
+14)
+In order to enable the developer mode, execute this command:
+bin/magento deploy:mode:set developer
+15)
+In order to enable the maintenance mode, execute this command:
+bin/magento maintenance:enable
+
+ 
+
+16)
+What are the differences between development and production mode in regard to frontend development?
+
+ 
+
+Developer mode:
+Static view files are not caching. They are recorded to the pub/static folder every time when they are requested
+Uncaught exceptions and errors are visible in browser;
+Exceptions and mistakes are recorded in var/log and /var/reports _;
+production mode:
+Static view files are served from cache. They do not have formed links in the pub/static catalog, the links are created along the way. New or updated files are not recorded to the file system.
+The errors are not shown to a user (on frontend), but they are recorded to the report files on the server.
+
+ 
+
+17)
+Thus, the main differences between server-side LESS compilation and client-side LESS compilation are as follows:
+
+ 
+
+server-side LESS compilation is done on the server side, while client-side LESS compilation on a client side (in a browser).
+client-side LESS compilation is run every time the page is reloaded, while server-side LESS compilation only after cleaning the “pub/static/frontend/<our_package>/<our_theme>/<local>”, “var/cache”, “var/view_preprocessed”  folders, the page refreshment or deploy.
+client-side Less compilation is not available in the Product mode, while server-side LESS compilation is available.
+
+ 
+
+18)How do you load a file with require.js?
+var config = {
+    map: {
+        '*': {
+            belvgmodule: 'Company_modulename/js/belvgrequirejs',
+        }
+    }
+};
+19)What options are available to configure JavaScript minification and bundling?
+Options responsible for merging and minify JS files configuration are on the path:
+
+ 
+
+Admin UI > Stores > Configuration > Advanced tab > Developer > JavaScript Settings
+
+
+
+
+
+Website Links
+------------------------------------
+
+https://belvg.com/tutorial/magento-2-certified-professional-front-end-developer-guide
+
+https://express.adobe.com/page/pAFqho0DzTI02/
+
+
+
+https://swiftotter.com/
+U: srinivas@jivainfotech.com
+P: jivateam@2019
+
